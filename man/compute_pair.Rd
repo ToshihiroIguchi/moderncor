@@ -4,7 +4,16 @@
 \alias{compute_pair}
 \title{Dispatch to the appropriate pair-wise compute function}
 \usage{
-compute_pair(x, y, z = NULL, method, alternative, p_value, ...)
+compute_pair(
+  x,
+  y,
+  z = NULL,
+  method,
+  alternative,
+  p_value,
+  method_partial = "pearson",
+  ...
+)
 }
 \arguments{
 \item{x}{Numeric vector.}
@@ -18,6 +27,8 @@ compute_pair(x, y, z = NULL, method, alternative, p_value, ...)
 \item{alternative}{Character: alternative hypothesis.}
 
 \item{p_value}{Logical: whether to calculate p-value.}
+
+\item{method_partial}{Character: correlation method to use for partial/semi-partial.}
 
 \item{...}{Additional arguments.}
 }

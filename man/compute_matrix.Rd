@@ -4,7 +4,17 @@
 \alias{compute_matrix}
 \title{Compute correlation matrix for all variable pairs}
 \usage{
-compute_matrix(mat, z = NULL, method, use, alternative, p_value, call, ...)
+compute_matrix(
+  mat,
+  z = NULL,
+  method,
+  use,
+  alternative,
+  p_value,
+  call,
+  method_partial = "pearson",
+  ...
+)
 }
 \arguments{
 \item{mat}{Numeric matrix.}
@@ -20,6 +30,8 @@ compute_matrix(mat, z = NULL, method, use, alternative, p_value, call, ...)
 \item{p_value}{Logical: whether to compute p-values.}
 
 \item{call}{The original function call.}
+
+\item{method_partial}{Character: correlation method to use for partial/semi-partial.}
 
 \item{...}{Additional arguments.}
 }

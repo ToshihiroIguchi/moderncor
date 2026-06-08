@@ -5,6 +5,7 @@
 #'
 #' @param x A numeric vector, matrix, or data.frame.
 #' @param y A numeric vector, or \code{NULL} if \code{x} is a matrix or data.frame.
+#' @param z A numeric vector, matrix, or data.frame representing control variables. Required for partial and semi-partial correlations.
 #' @param method Character: the association method to compute. Must be one of:
 #'   \itemize{
 #'     \item \code{"pearson"}: Pearson product-moment correlation (linear).
@@ -16,6 +17,15 @@
 #'     \item \code{"xi"}: Chatterjee's Xi correlation (functional dependence).
 #'     \item \code{"hoeffding"}: Hoeffding's D statistic (general dependence).
 #'     \item \code{"mutual_info"}: Mutual Information (information-theoretic dependence).
+#'     \item \code{"biweight"}: Biweight midcorrelation (robust).
+#'     \item \code{"percentage_bend"}: Percentage bend correlation (robust).
+#'     \item \code{"winsorized"}: Winsorized correlation (robust).
+#'     \item \code{"polychoric"}: Polychoric correlation (ordinal).
+#'     \item \code{"tetrachoric"}: Tetrachoric correlation (ordinal).
+#'     \item \code{"partial"}: Partial correlation controlling for variables in \code{z}.
+#'     \item \code{"semi_partial"}: Semi-partial correlation controlling for variables in \code{z}.
+#'     \item \code{"ball"}: Ball correlation (general dependence).
+#'     \item \code{"tau_star"}: Bergsma-Dassios Tau* (general dependence).
 #'   }
 #' @param alternative Character: alternative hypothesis. Must be one of
 #'   \code{"two.sided"}, \code{"less"}, or \code{"greater"}. Note that this is
@@ -32,6 +42,8 @@
 #'     \item \code{"pairwise.complete.obs"}: Compute correlations pairwise using all
 #'           complete observations for each pair (only applicable for matrix/data.frame inputs).
 #'   }
+#' @param method_partial Character: correlation method to use for partial/semi-partial.
+#'   Must be one of \code{"pearson"}, \code{"spearman"}, or \code{"kendall"}.
 #' @param ... Additional arguments passed to the underlying compute functions.
 #'   For example, \code{B} for the number of permutations in MIC or Mutual Information,
 #'   or \code{R} for distance correlation.
