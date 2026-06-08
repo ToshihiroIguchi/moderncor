@@ -4,12 +4,14 @@
 \alias{compute_pair}
 \title{Dispatch to the appropriate pair-wise compute function}
 \usage{
-compute_pair(x, y, method, alternative, p_value, ...)
+compute_pair(x, y, z = NULL, method, alternative, p_value, ...)
 }
 \arguments{
 \item{x}{Numeric vector.}
 
 \item{y}{Numeric vector.}
+
+\item{z}{Numeric vector, matrix, or data.frame representing control variables.}
 
 \item{method}{Character: correlation method.}
 

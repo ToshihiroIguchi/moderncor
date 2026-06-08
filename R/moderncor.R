@@ -56,30 +56,36 @@
 #'
 #' # Compute correlation matrix for iris dataset (first 4 columns)
 #' moderncor(iris[, 1:4], method = "pearson")
-moderncor <- function(x, y = NULL,
+moderncor <- function(x, y = NULL, z = NULL,
                       method = c("pearson", "spearman", "kendall",
                                  "dcor", "mic", "hsic", "xi",
-                                 "hoeffding", "mutual_info"),
+                                 "hoeffding", "mutual_info",
+                                 "biweight", "percentage_bend", "winsorized",
+                                 "polychoric", "tetrachoric",
+                                 "partial", "semi_partial",
+                                 "ball", "tau_star"),
                       alternative = c("two.sided", "less", "greater"),
                       p_value = TRUE,
                       use = c("complete.obs", "everything",
                               "pairwise.complete.obs"),
+                      method_partial = c("pearson", "spearman", "kendall"),
                       ...) {
   method <- match.arg(method)
   alternative <- match.arg(alternative)
   use <- match.arg(use)
+  method_partial <- match.arg(method_partial)
   call <- match.call()
   
   # Validate and normalize input
-  input <- validate_input(x, y, method, use)
+  input <- validate_input(x, y, z, method, use)
   
   # Compute matrix of pairwise correlations
   if (input$type == "matrix") {
-    return(compute_matrix(input$data, method, use, alternative, p_value, call, ...))
+    return(compute_matrix(input$data, input$z, method, use, alternative, p_value, call, method_partial = method_partial, ...))
   }
   
   # Compute single pair correlation
-  result <- compute_pair(input$x, input$y, method, alternative, p_value, ...)
+  result <- compute_pair(input$x, input$y, input$z, method, alternative, p_value, method_partial = method_partial, ...)
   
   structure(
     c(result, list(n = length(input$x), call = call)),

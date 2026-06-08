@@ -4,10 +4,12 @@
 \alias{compute_matrix}
 \title{Compute correlation matrix for all variable pairs}
 \usage{
-compute_matrix(mat, method, use, alternative, p_value, call, ...)
+compute_matrix(mat, z = NULL, method, use, alternative, p_value, call, ...)
 }
 \arguments{
 \item{mat}{Numeric matrix.}
+
+\item{z}{Numeric vector, matrix, or data.frame representing control variables.}
 
 \item{method}{Character: correlation method.}
 

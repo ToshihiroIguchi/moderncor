@@ -4,7 +4,7 @@
 \alias{validate_input}
 \title{Validate and normalize input for moderncor}
 \usage{
-validate_input(x, y, method, use)
+validate_input(x, y, z = NULL, method, use)
 }
 \arguments{
 \item{x}{A numeric vector, matrix, or data.frame.}

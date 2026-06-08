@@ -14,7 +14,16 @@ available_methods <- function() {
     list(method = "hsic", label = "Hilbert-Schmidt Independence Criterion (HSIC)", package = "dHSIC", type = "modern"),
     list(method = "xi", label = "Chatterjee's Xi Correlation", package = "XICOR", type = "modern"),
     list(method = "hoeffding", label = "Hoeffding's D", package = "Hmisc", type = "modern"),
-    list(method = "mutual_info", label = "Mutual Information", package = "infotheo", type = "information")
+    list(method = "mutual_info", label = "Mutual Information", package = "infotheo", type = "information"),
+    list(method = "biweight", label = "Biweight Midcorrelation", package = "asbio", type = "robust"),
+    list(method = "percentage_bend", label = "Percentage Bend Correlation", package = "WRS2", type = "robust"),
+    list(method = "winsorized", label = "Winsorized Correlation", package = "WRS2", type = "robust"),
+    list(method = "polychoric", label = "Polychoric Correlation", package = "psych", type = "ordinal"),
+    list(method = "tetrachoric", label = "Tetrachoric Correlation", package = "psych", type = "ordinal"),
+    list(method = "partial", label = "Partial Correlation", package = "ppcor", type = "partial"),
+    list(method = "semi_partial", label = "Semi-partial Correlation", package = "ppcor", type = "partial"),
+    list(method = "ball", label = "Ball Correlation", package = "Ball", type = "other"),
+    list(method = "tau_star", label = "Bergsma-Dassios Tau*", package = "TauStar", type = "other")
   )
   
   df <- do.call(rbind, lapply(methods_list, as.data.frame))
@@ -107,6 +116,78 @@ method_info <- function(method) {
       description = "Information-theoretic measure of the mutual dependence between two variables after discretization.",
       range = "[0, Inf)",
       assumptions = "Continuous variables (discretized) or categorical."
+    ),
+    biweight = list(
+      method = "biweight",
+      label = "Biweight Midcorrelation",
+      package = "asbio",
+      description = "Robust correlation measure that is insensitive to outliers.",
+      range = "[-1, 1]",
+      assumptions = "Continuous variables."
+    ),
+    percentage_bend = list(
+      method = "percentage_bend",
+      label = "Percentage Bend Correlation",
+      package = "WRS2",
+      description = "Robust correlation based on percentage bend of deviations.",
+      range = "[-1, 1]",
+      assumptions = "Continuous variables."
+    ),
+    winsorized = list(
+      method = "winsorized",
+      label = "Winsorized Correlation",
+      package = "WRS2",
+      description = "Robust correlation using Winsorized values.",
+      range = "[-1, 1]",
+      assumptions = "Continuous variables."
+    ),
+    polychoric = list(
+      method = "polychoric",
+      label = "Polychoric Correlation",
+      package = "psych",
+      description = "Measures association between two ordered-categorical variables.",
+      range = "[-1, 1]",
+      assumptions = "Ordinal variables with latent bivariate normality."
+    ),
+    tetrachoric = list(
+      method = "tetrachoric",
+      label = "Tetrachoric Correlation",
+      package = "psych",
+      description = "Measures association between two binary variables.",
+      range = "[-1, 1]",
+      assumptions = "Binary variables with latent bivariate normality."
+    ),
+    partial = list(
+      method = "partial",
+      label = "Partial Correlation",
+      package = "ppcor",
+      description = "Measures association between two variables controlling for others.",
+      range = "[-1, 1]",
+      assumptions = "Continuous variables, normality of residuals."
+    ),
+    semi_partial = list(
+      method = "semi_partial",
+      label = "Semi-partial Correlation",
+      package = "ppcor",
+      description = "Measures association between two variables controlling for others in one variable.",
+      range = "[-1, 1]",
+      assumptions = "Continuous variables, normality of residuals."
+    ),
+    ball = list(
+      method = "ball",
+      label = "Ball Correlation",
+      package = "Ball",
+      description = "Nonparametric measure of association based on ball distances.",
+      range = "[0, 1]",
+      assumptions = "Continuous variables."
+    ),
+    tau_star = list(
+      method = "tau_star",
+      label = "Bergsma-Dassios Tau*",
+      package = "TauStar",
+      description = "Nonparametric measure of association that is zero if and only if independent.",
+      range = "[-0.5, 1]",
+      assumptions = "Continuous variables."
     )
   )
   

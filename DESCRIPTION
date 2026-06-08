@@ -23,6 +23,13 @@ Suggests:
     Hmisc,
     dHSIC,
     infotheo,
+    WRS2,
+    asbio,
+    psych,
+    ppcor,
+    Ball,
+    TauStar,
+    DescTools,
     testthat (>= 3.0.0),
     knitr,
     rmarkdown

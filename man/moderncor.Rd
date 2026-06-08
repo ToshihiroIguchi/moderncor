@@ -7,11 +7,14 @@
 moderncor(
   x,
   y = NULL,
+  z = NULL,
   method = c("pearson", "spearman", "kendall", "dcor", "mic", "hsic", "xi", "hoeffding",
-    "mutual_info"),
+    "mutual_info", "biweight", "percentage_bend", "winsorized", "polychoric",
+    "tetrachoric", "partial", "semi_partial", "ball", "tau_star"),
   alternative = c("two.sided", "less", "greater"),
   p_value = TRUE,
   use = c("complete.obs", "everything", "pairwise.complete.obs"),
+  method_partial = c("pearson", "spearman", "kendall"),
   ...
 )
 }
