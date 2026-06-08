@@ -23,7 +23,7 @@ print.moderncor <- function(x, digits = 4, ...) {
       cat("  Statistic: ", round(x$statistic, digits), "\n", sep = "")
     }
     
-    if (!is.null(x$p.value)) {
+    if (!is.null(x$p.value) && !is.na(x$p.value)) {
       if (x$p.value < 2.2e-16) {
         cat("  P-value:   < 2.2e-16\n")
       } else {

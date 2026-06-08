@@ -21,8 +21,10 @@ compute_dcor <- function(x, y, alternative = "two.sided", p_value = TRUE, ...) {
     }
     
     test_res <- do.call(energy::dcor.test, c(list(x, y), args))
+    # dcor.test$statistic is nV_n (test statistic), not the dCor estimate
+    est <- energy::dcor(x, y)
     list(
-      estimate = unname(test_res$statistic), # dcor estimate is the statistic in dcor.test
+      estimate = est,
       method = "dcor",
       method_label = "Distance Correlation",
       statistic = unname(test_res$statistic),
@@ -57,18 +59,18 @@ compute_mic <- function(x, y, alternative = "two.sided", p_value = TRUE, ...) {
   }
   
   # Compute observed MIC
-  mine_res <- minerva::mine(x, y, ...)
+  # Remove B from ... since it is used for our permutation test, not for mine()
+  args <- list(...)
+  mine_args <- args
+  mine_args$B <- NULL
+  mine_res <- do.call(minerva::mine, c(list(x, y), mine_args))
   est <- mine_res$MIC[1]
   
   pval <- NULL
   if (p_value) {
     # Permutation test for MIC
     # Extract optional B (number of permutations) from ... or default to 99
-    args <- list(...)
     B <- if (!is.null(args$B)) args$B else 99
-    # Remove B from mine arguments
-    mine_args <- args
-    mine_args$B <- NULL
     
     perm_mics <- numeric(B)
     n <- length(y)

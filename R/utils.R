@@ -137,7 +137,13 @@ compute_matrix <- function(mat, method, use, alternative, p_value, call, ...) {
   }
   
   est_mat <- matrix(NA_real_, nrow = n_cols, ncol = n_cols, dimnames = list(col_names, col_names))
-  diag(est_mat) <- 1.0 # default self-correlation
+  # For normalized correlation measures [-1,1] or [0,1], self-correlation is 1.0
+  # For unnormalized measures (HSIC, mutual_info), diagonal is not necessarily 1.0
+  # We set 1.0 as default; HSIC/mutual_info self-values should be computed if needed
+  normalized_methods <- c("pearson", "spearman", "kendall", "dcor", "mic", "xi", "hoeffding")
+  if (method %in% normalized_methods) {
+    diag(est_mat) <- 1.0
+  }
   
   pval_mat <- NULL
   if (p_value) {
