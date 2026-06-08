@@ -1,0 +1,9 @@
+^.*\.Rproj$
+^\.Rproj\.user$
+^CLAUDE\.md$
+^GEMINI\.md$
+^\.github$
+^cran-comments\.md$
+^.*\.tar\.gz$
+^tests/testthat/\.RData$
+^.*\.Rcheck$

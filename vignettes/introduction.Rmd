@@ -1,0 +1,97 @@
+---
+title: "Introduction to moderncor"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to moderncor}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+The `moderncor` package provides a single unified interface for computing a wide variety of classical and modern correlation coefficients. This guide introduces the core features of the package.
+
+## Installation and Setup
+
+Once installed, you can load the package as follows:
+
+```r
+library(moderncor)
+```
+
+## Basic Usage with Vectors
+
+Let's generate some synthetic data with a non-linear parabolic relationship where $y = x^2 + \epsilon$:
+
+```{r setup-data}
+set.seed(123)
+x <- runif(100, -1, 1)
+y <- x^2 + rnorm(100, sd = 0.1)
+```
+
+Because the relationship is non-linear and symmetric, classical Pearson correlation will fail to capture the dependence:
+
+```r
+library(moderncor)
+moderncor(x, y, method = "pearson")
+```
+
+With `moderncor`, you can compute distance correlation (`dcor`) or Chatterjee's Xi correlation (`xi`) using the same interface to capture the non-linear relationship:
+
+```r
+# Distance Correlation (captures non-linear dependencies)
+moderncor(x, y, method = "dcor")
+
+# Chatterjee's Xi (captures functional dependence)
+moderncor(x, y, method = "xi")
+```
+
+## Matrix and Data Frame Input
+
+If you pass a matrix or a `data.frame` to `moderncor()`, it will compute the pairwise correlation matrix of the columns:
+
+```r
+# Compute Spearman correlation matrix for iris dataset
+res_mat <- moderncor(iris[, 1:4], method = "spearman")
+res_mat
+```
+
+## Tidy Output using `as.data.frame`
+
+You can convert the output of `moderncor()` to a tidy data frame using `as.data.frame()`. This is particularly useful for correlation matrices:
+
+```r
+# Convert correlation matrix to tidy data frame
+df <- as.data.frame(res_mat)
+head(df)
+```
+
+This returns a data frame containing the variables being compared (`var1` and `var2`), the correlation coefficient (`r`), and p-values (`p.value`) if they were calculated.
+
+## Controlling P-value Computation
+
+For large datasets, calculating p-values for modern methods (such as MIC, HSIC, or Mutual Information) can be slow because they rely on permutation tests. You can disable p-value calculations by setting `p_value = FALSE` for a significant speedup:
+
+```r
+# Compute only the estimate, without p-values
+moderncor(x, y, method = "dcor", p_value = FALSE)
+```
+
+## Querying Available Methods
+
+To see all supported correlation methods and their required packages:
+
+```r
+available_methods()
+```
+
+To get details on a specific method:
+
+```r
+method_info("dcor")
+```

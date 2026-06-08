@@ -1,0 +1,88 @@
+#' Compute classical and modern correlation coefficients
+#'
+#' This function provides a single unified interface to compute a wide range of
+#' classical and modern correlation and association measures.
+#'
+#' @param x A numeric vector, matrix, or data.frame.
+#' @param y A numeric vector, or \code{NULL} if \code{x} is a matrix or data.frame.
+#' @param method Character: the association method to compute. Must be one of:
+#'   \itemize{
+#'     \item \code{"pearson"}: Pearson product-moment correlation (linear).
+#'     \item \code{"spearman"}: Spearman rank correlation (monotonic).
+#'     \item \code{"kendall"}: Kendall rank correlation (monotonic).
+#'     \item \code{"dcor"}: Distance correlation (general dependence).
+#'     \item \code{"mic"}: Maximal Information Coefficient (general dependence).
+#'     \item \code{"hsic"}: Hilbert-Schmidt Independence Criterion (general dependence).
+#'     \item \code{"xi"}: Chatterjee's Xi correlation (functional dependence).
+#'     \item \code{"hoeffding"}: Hoeffding's D statistic (general dependence).
+#'     \item \code{"mutual_info"}: Mutual Information (information-theoretic dependence).
+#'   }
+#' @param alternative Character: alternative hypothesis. Must be one of
+#'   \code{"two.sided"}, \code{"less"}, or \code{"greater"}. Note that this is
+#'   only supported for classic methods (Pearson, Spearman, Kendall). For modern
+#'   and general dependence measures, it is ignored with a warning.
+#' @param p_value Logical: whether to compute the p-value. Default is \code{TRUE}.
+#'   For some modern methods (e.g. MIC, HSIC, Mutual Information), computing p-values
+#'   can be slow because they rely on permutation tests. Set to \code{FALSE} for
+#'   fast computation of estimates only.
+#' @param use Character: how to handle missing values. Must be one of:
+#'   \itemize{
+#'     \item \code{"complete.obs"}: Remove observations with missing values (default).
+#'     \item \code{"everything"}: Keep missing values (results in \code{NA} if present).
+#'     \item \code{"pairwise.complete.obs"}: Compute correlations pairwise using all
+#'           complete observations for each pair (only applicable for matrix/data.frame inputs).
+#'   }
+#' @param ... Additional arguments passed to the underlying compute functions.
+#'   For example, \code{B} for the number of permutations in MIC or Mutual Information,
+#'   or \code{R} for distance correlation.
+#'
+#' @return An object of class \code{"moderncor"}.
+#'
+#' @export
+#' @examples
+#' # Generate some non-linear data (parabolic relationship)
+#' set.seed(123)
+#' x <- runif(100, -1, 1)
+#' y <- x^2 + rnorm(100, sd = 0.1)
+#'
+#' # Pearson correlation (close to 0 due to non-linearity)
+#' moderncor(x, y, method = "pearson")
+#'
+#' # Distance correlation (captures non-linear association)
+#' moderncor(x, y, method = "dcor")
+#'
+#' # Chatterjee's Xi correlation
+#' moderncor(x, y, method = "xi")
+#'
+#' # Compute correlation matrix for iris dataset (first 4 columns)
+#' moderncor(iris[, 1:4], method = "pearson")
+moderncor <- function(x, y = NULL,
+                      method = c("pearson", "spearman", "kendall",
+                                 "dcor", "mic", "hsic", "xi",
+                                 "hoeffding", "mutual_info"),
+                      alternative = c("two.sided", "less", "greater"),
+                      p_value = TRUE,
+                      use = c("complete.obs", "everything",
+                              "pairwise.complete.obs"),
+                      ...) {
+  method <- match.arg(method)
+  alternative <- match.arg(alternative)
+  use <- match.arg(use)
+  call <- match.call()
+  
+  # Validate and normalize input
+  input <- validate_input(x, y, method, use)
+  
+  # Compute matrix of pairwise correlations
+  if (input$type == "matrix") {
+    return(compute_matrix(input$data, method, use, alternative, p_value, call, ...))
+  }
+  
+  # Compute single pair correlation
+  result <- compute_pair(input$x, input$y, method, alternative, p_value, ...)
+  
+  structure(
+    c(result, list(n = length(input$x), call = call)),
+    class = "moderncor"
+  )
+}
