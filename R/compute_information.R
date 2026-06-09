@@ -43,8 +43,11 @@ compute_mutual_info <- function(x, y, alternative = "two.sided", p_value = TRUE,
   
   pval <- NULL
   if (p_value) {
+    # infotheo::mutinformation returns only the MI estimate, not a p-value, and
+    # no CRAN package provides an MI-based independence test, so a permutation
+    # test is self-implemented here (permitted by CLAUDE.md in this case).
     B <- if (!is.null(args$B)) args$B else 99
-    
+
     perm_mis <- numeric(B)
     for (b in seq_len(B)) {
       perm_dy_vec <- dy_vec[sample.int(N)]
@@ -54,11 +57,13 @@ compute_mutual_info <- function(x, y, alternative = "two.sided", p_value = TRUE,
     pval <- (sum(perm_mis >= mi) + 1) / (B + 1)
   }
   
+  # MI has no distinct test statistic; the permutation test uses the estimate
+  # itself, so `statistic` is left NULL to avoid duplicating `estimate`.
   list(
     estimate = mi,
     method = "mutual_info",
     method_label = "Mutual Information",
-    statistic = mi,
+    statistic = NULL,
     p.value = pval
   )
 }

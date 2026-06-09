@@ -15,7 +15,7 @@ available_methods <- function() {
     list(method = "xi", label = "Chatterjee's Xi Correlation", package = "XICOR", type = "modern"),
     list(method = "hoeffding", label = "Hoeffding's D", package = "Hmisc", type = "modern"),
     list(method = "mutual_info", label = "Mutual Information", package = "infotheo", type = "information"),
-    list(method = "biweight", label = "Biweight Midcorrelation", package = "asbio", type = "robust"),
+    list(method = "biweight", label = "Biweight Midcorrelation", package = "WGCNA", type = "robust"),
     list(method = "percentage_bend", label = "Percentage Bend Correlation", package = "WRS2", type = "robust"),
     list(method = "winsorized", label = "Winsorized Correlation", package = "WRS2", type = "robust"),
     list(method = "polychoric", label = "Polychoric Correlation", package = "psych", type = "ordinal"),
@@ -120,7 +120,7 @@ method_info <- function(method) {
     biweight = list(
       method = "biweight",
       label = "Biweight Midcorrelation",
-      package = "asbio",
+      package = "WGCNA",
       description = "Robust correlation measure that is insensitive to outliers.",
       range = "[-1, 1]",
       assumptions = "Continuous variables."

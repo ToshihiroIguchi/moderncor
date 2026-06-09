@@ -1,15 +1,16 @@
 test_that("Robust correlations compute correctly", {
-  skip_if_not_installed("asbio")
+  skip_if_not_installed("WGCNA")
   skip_if_not_installed("WRS2")
-  
+
   set.seed(42)
   x <- rnorm(15)
   y <- rnorm(15)
-  
+
   # biweight
   res_bw <- moderncor(x, y, method = "biweight")
   expect_s3_class(res_bw, "moderncor")
-  expect_equal(res_bw$estimate, as.numeric(asbio::r.bw(x, y)[1, "r.xy"]))
+  expect_equal(res_bw$estimate, as.numeric(WGCNA::bicor(x, y)))
+  expect_equal(res_bw$p.value, as.numeric(WGCNA::bicorAndPvalue(x, y)$p))
   expect_true(res_bw$p.value >= 0 && res_bw$p.value <= 1)
   
   # percentage_bend
