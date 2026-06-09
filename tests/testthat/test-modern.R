@@ -55,9 +55,14 @@ test_that("HSIC works when dHSIC is installed", {
   expect_s3_class(res, "moderncor")
   expect_gt(res$estimate, 0)
   expect_true(!is.null(res$p.value))
-  
+
   res_no_p <- moderncor(x, y, method = "hsic", p_value = FALSE)
   expect_null(res_no_p$p.value)
+
+  # estimate must be the dHSIC value and independent of whether p_value is
+  # requested (regression guard: it previously returned the test statistic).
+  expect_equal(res$estimate, dHSIC::dhsic(list(x, y))$dHSIC)
+  expect_equal(res$estimate, res_no_p$estimate)
 })
 
 test_that("Hoeffding's D works when Hmisc is installed", {

@@ -58,7 +58,7 @@ moderncor/
 
 - **Imports** (always available): `stats`, `energy`, `XICOR`
 - **Suggests** (checked at runtime): `minerva`, `Hmisc`, `dHSIC`, `infotheo`,
-  `WRS2`, `asbio`, `psych`, `ppcor`, `Ball`, `TauStar`, `DescTools`,
+  `WRS2`, `WGCNA`, `psych`, `ppcor`, `Ball`, `TauStar`, `DescTools`,
   `testthat`, `knitr`, `rmarkdown`
 
 When a Suggests package is needed but not installed, use:

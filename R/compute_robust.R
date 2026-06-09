@@ -8,44 +8,32 @@
 #' @return A list of correlation results.
 #' @keywords internal
 compute_biweight <- function(x, y, alternative = "two.sided", p_value = TRUE, ...) {
-  check_suggested("asbio", "biweight")
-  
+  check_suggested("WGCNA", "biweight")
+
   alternative <- match.arg(alternative, c("two.sided", "greater", "less"))
-  
-  # Compute correlation using asbio::r.bw
-  res <- asbio::r.bw(x, y, ...)
-  # r.bw returns a matrix/data.frame-like object with column 'r.xy'
-  est <- as.numeric(res[1, "r.xy"])
-  
-  n <- length(x)
-  pval <- NULL
-  stat <- NULL
-  
+
   if (p_value) {
-    if (n <= 2) {
-      stat <- NA_real_
-      pval <- NA_real_
-    } else if (abs(est) >= 1) {
-      stat <- Inf * sign(est)
-      pval <- 0
-    } else {
-      stat <- est * sqrt((n - 2) / (1 - est^2))
-      pval <- switch(
-        alternative,
-        "two.sided" = 2 * stats::pt(abs(stat), df = n - 2, lower.tail = FALSE),
-        "greater"   = stats::pt(stat, df = n - 2, lower.tail = FALSE),
-        "less"      = stats::pt(stat, df = n - 2, lower.tail = TRUE)
-      )
-    }
+    # WGCNA::bicorAndPvalue() returns the biweight midcorrelation together with
+    # its t statistic and p-value (including one-sided alternatives), so both the
+    # statistic and the p-value are delegated to WGCNA rather than self-implemented.
+    res <- WGCNA::bicorAndPvalue(x, y, alternative = alternative, ...)
+    list(
+      estimate = as.numeric(res$bicor[1, 1]),
+      method = "biweight",
+      method_label = "Biweight Midcorrelation",
+      statistic = as.numeric(res$t[1, 1]),
+      p.value = as.numeric(res$p[1, 1])
+    )
+  } else {
+    est <- as.numeric(WGCNA::bicor(x, y, ...))
+    list(
+      estimate = est,
+      method = "biweight",
+      method_label = "Biweight Midcorrelation",
+      statistic = NULL,
+      p.value = NULL
+    )
   }
-  
-  list(
-    estimate = est,
-    method = "biweight",
-    method_label = "Biweight Midcorrelation",
-    statistic = stat,
-    p.value = pval
-  )
 }
 
 #' Compute Percentage Bend Correlation

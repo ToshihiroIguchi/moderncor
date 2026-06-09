@@ -68,7 +68,9 @@ compute_mic <- function(x, y, alternative = "two.sided", p_value = TRUE, ...) {
   
   pval <- NULL
   if (p_value) {
-    # Permutation test for MIC
+    # minerva::mine returns only the MIC estimate, not a p-value, and no CRAN
+    # package provides an MIC independence test, so a permutation test is
+    # self-implemented here (CLAUDE.md permits self-implementation in this case).
     # Extract optional B (number of permutations) from ... or default to 99
     B <- if (!is.null(args$B)) args$B else 99
     
@@ -83,11 +85,13 @@ compute_mic <- function(x, y, alternative = "two.sided", p_value = TRUE, ...) {
     pval <- (sum(perm_mics >= est) + 1) / (B + 1)
   }
   
+  # MIC has no distinct test statistic; the permutation test uses the estimate
+  # itself, so `statistic` is left NULL to avoid duplicating `estimate`.
   list(
     estimate = est,
     method = "mic",
     method_label = "Maximal Information Coefficient (MIC)",
-    statistic = est,
+    statistic = NULL,
     p.value = pval
   )
 }
@@ -109,9 +113,13 @@ compute_hsic <- function(x, y, alternative = "two.sided", p_value = TRUE, ...) {
   }
   
   if (p_value) {
+    # dhsic.test$statistic is the test statistic (n * dHSIC), not the dHSIC
+    # estimate itself. Compute the estimate separately via dHSIC::dhsic so that
+    # `estimate` is consistent regardless of whether p_value is requested.
     test_res <- dHSIC::dhsic.test(list(x, y), ...)
+    est <- dHSIC::dhsic(list(x, y))$dHSIC
     list(
-      estimate = unname(test_res$statistic),
+      estimate = est,
       method = "hsic",
       method_label = "Hilbert-Schmidt Independence Criterion (HSIC)",
       statistic = unname(test_res$statistic),
@@ -146,11 +154,13 @@ compute_xi <- function(x, y, alternative = "two.sided", p_value = TRUE, ...) {
   res <- XICOR::xicor(x, y, pvalue = p_value, ...)
   
   if (p_value) {
+    # XICOR reports the xi coefficient and its p-value but not a separate test
+    # statistic, so `statistic` is left NULL rather than duplicating `estimate`.
     list(
       estimate = unname(res$xi),
       method = "xi",
       method_label = "Chatterjee's Xi Correlation",
-      statistic = unname(res$xi),
+      statistic = NULL,
       p.value = res$pval
     )
   } else {
@@ -183,12 +193,14 @@ compute_hoeffding <- function(x, y, alternative = "two.sided", p_value = TRUE, .
   res <- Hmisc::hoeffd(x, y)
   
   pval <- if (p_value) res$P[1, 2] else NULL
-  
+
+  # Hmisc::hoeffd derives the p-value from the asymptotic distribution of D and
+  # exposes no separate test statistic, so `statistic` is left NULL.
   list(
     estimate = res$D[1, 2],
     method = "hoeffding",
     method_label = "Hoeffding's D",
-    statistic = res$D[1, 2],
+    statistic = NULL,
     p.value = pval
   )
 }
