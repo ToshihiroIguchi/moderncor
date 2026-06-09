@@ -15,7 +15,7 @@ compute_biweight(x, y, alternative = "two.sided", p_value = TRUE, ...)
 
 \item{p_value}{Logical: whether to compute p-value.}
 
-\item{...}{Additional arguments.}
+\item{...}{Additional arguments (currently unused).}
 }
 \value{
 A list of correlation results.

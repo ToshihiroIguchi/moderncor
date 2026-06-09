@@ -1,14 +1,20 @@
 Package: moderncor
 Type: Package
 Title: Unified Interface for Modern and Classical Correlation Coefficients
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: person("Toshihiro", "Iguchi", role = c("aut", "cre"),
-                   email = "toshihiro.iguchi.mail@gmail.com")
-Description: Provides a single unified function to compute a wide variety of
-    correlation and association measures including Pearson, Spearman, Kendall,
-    distance correlation, maximal information coefficient (MIC),
-    Hilbert-Schmidt independence criterion (HSIC), Chatterjee's xi correlation,
-    Hoeffding's D, and mutual information.
+                   email = "toshihiro.iguchi.github@gmail.com")
+Description: Provides a single unified interface for computing a wide variety of
+    classical and modern correlation and association measures. Continuous methods
+    include classical correlations (Pearson, Spearman, Kendall), modern dependence
+    measures (distance correlation, maximal information coefficient, Hilbert-Schmidt
+    independence criterion, Chatterjee's xi, Hoeffding's D, mutual information),
+    robust correlations (biweight midcorrelation, percentage bend, Winsorized),
+    ordinal correlations (polychoric, tetrachoric), partial and semi-partial
+    correlations, and nonparametric measures (ball correlation, Bergsma-Dassios
+    tau*). Categorical association measures (Cramer's V, phi coefficient,
+    Goodman-Kruskal gamma, Somers' D, contingency coefficient, Tschuprow's T)
+    are available via moderncor_cat().
 License: GPL-3
 URL: https://github.com/ToshihiroIguchi/moderncor
 BugReports: https://github.com/ToshihiroIguchi/moderncor/issues
@@ -24,7 +30,6 @@ Suggests:
     dHSIC,
     infotheo,
     WRS2,
-    WGCNA,
     psych,
     ppcor,
     Ball,

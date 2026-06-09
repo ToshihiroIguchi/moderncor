@@ -234,6 +234,26 @@ compute_matrix_cat <- function(df, method, use, call, ...) {
   )
 }
 
+#' List all available categorical association methods
+#'
+#' @return A data.frame with method names, labels, package requirements, and type.
+#' @export
+#' @examples
+#' available_methods_cat()
+available_methods_cat <- function() {
+  methods_list <- list(
+    list(method = "cramers_v",   label = "Cramer's V",              package = "DescTools", type = "nominal"),
+    list(method = "phi",         label = "Phi Coefficient",         package = "DescTools", type = "nominal"),
+    list(method = "gamma",       label = "Goodman-Kruskal Gamma",   package = "DescTools", type = "ordinal"),
+    list(method = "somers_d",    label = "Somers' D",               package = "DescTools", type = "ordinal"),
+    list(method = "contingency", label = "Contingency Coefficient", package = "DescTools", type = "nominal"),
+    list(method = "tschuprow",   label = "Tschuprow's T",           package = "DescTools", type = "nominal")
+  )
+  df <- do.call(rbind, lapply(methods_list, as.data.frame))
+  rownames(df) <- NULL
+  df
+}
+
 #' Information about categorical association methods
 #'
 #' @keywords internal

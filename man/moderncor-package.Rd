@@ -17,11 +17,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Toshihiro Iguchi \email{toshihiro.iguchi.mail@gmail.com}
+\strong{Maintainer}: Toshihiro Iguchi \email{toshihiro.iguchi.github@gmail.com}
 
 Authors:
 \itemize{
-  \item Toshihiro Iguchi \email{toshihiro.iguchi.mail@gmail.com}
+  \item Toshihiro Iguchi \email{toshihiro.iguchi.github@gmail.com}
 }
 
 }
