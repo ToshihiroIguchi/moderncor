@@ -1,0 +1,186 @@
+---
+title: "Categorical Association Measures"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Categorical Association Measures}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(moderncor)
+```
+
+The `moderncor_cat()` function provides a unified interface for computing association measures between categorical (factor) variables. All measures require the `DescTools` package.
+
+```{r check-desctool, eval = !requireNamespace("DescTools", quietly = TRUE), echo = FALSE}
+message("The DescTools package is not installed. Install it with: install.packages('DescTools')")
+```
+
+## Basic Usage
+
+`moderncor_cat()` accepts two factor (or character/numeric-as-categorical) vectors:
+
+```{r basic, eval = requireNamespace("DescTools", quietly = TRUE)}
+set.seed(42)
+x <- factor(sample(c("A", "B", "C"), 100, replace = TRUE))
+y <- factor(sample(c("X", "Y"), 100, replace = TRUE))
+
+moderncor_cat(x, y, method = "cramers_v")
+```
+
+The output is an S3 object of class `"moderncor_cat"` with the same structure as `moderncor()` output:
+
+- `$estimate`: the association coefficient
+- `$statistic`: the chi-square test statistic (for nominal methods)
+- `$p.value`: the p-value (for nominal methods; `NULL` for ordinal methods)
+- `$n`: the sample size
+- `$method_label`: human-readable method name
+
+## Querying Available Methods
+
+```{r available-methods-cat}
+available_methods_cat()
+```
+
+Methods fall into two categories:
+
+- **Nominal**: for unordered categories (Cramér's V, Phi, Contingency Coefficient, Tschuprow's T)
+- **Ordinal**: for ordered categories (Goodman-Kruskal Gamma, Somers' D)
+
+## Nominal Association Measures
+
+Nominal measures are appropriate when categories have no natural ordering. They are all based on the chi-square statistic and return a p-value.
+
+### Cramér's V
+
+Cramér's V is the most widely used measure of nominal association. It ranges from 0 (no association) to 1 (perfect association) and is symmetric:
+
+```{r cramers-v, eval = requireNamespace("DescTools", quietly = TRUE)}
+moderncor_cat(x, y, method = "cramers_v")
+```
+
+For a 2×2 table, Cramér's V equals the absolute value of the Phi coefficient.
+
+### Phi Coefficient
+
+The Phi coefficient is designed for 2×2 contingency tables. For larger tables it can exceed 1, so prefer Cramér's V in that case:
+
+```{r phi, eval = requireNamespace("DescTools", quietly = TRUE)}
+x_bin <- factor(sample(c("Yes", "No"), 100, replace = TRUE))
+y_bin <- factor(sample(c("Pass", "Fail"), 100, replace = TRUE))
+
+moderncor_cat(x_bin, y_bin, method = "phi")
+```
+
+### Contingency Coefficient
+
+The contingency coefficient (Pearson's C) is bounded between 0 and $\sqrt{(k-1)/k}$ where $k$ is the number of categories, so it is not comparable across tables of different sizes:
+
+```{r contingency, eval = requireNamespace("DescTools", quietly = TRUE)}
+moderncor_cat(x, y, method = "contingency")
+```
+
+### Tschuprow's T
+
+Tschuprow's T is similar to Cramér's V but uses the geometric mean of the marginal category counts as its normalizer. It is symmetric and ranges from 0 to 1:
+
+```{r tschuprow, eval = requireNamespace("DescTools", quietly = TRUE)}
+moderncor_cat(x, y, method = "tschuprow")
+```
+
+## Ordinal Association Measures
+
+Ordinal measures are appropriate when categories have a natural ordering (e.g., Likert scales, severity grades). They do not return p-values by default.
+
+### Goodman-Kruskal Gamma
+
+Goodman-Kruskal Gamma ($\gamma$) measures the tendency for pairs of observations to be concordant (both variables increase together) vs. discordant. It ranges from −1 to 1 and is symmetric:
+
+```{r gamma-data, eval = requireNamespace("DescTools", quietly = TRUE)}
+# Simulate ordinal survey data
+set.seed(1)
+quality  <- factor(sample(c("Low", "Medium", "High"), 100, replace = TRUE,
+                           prob = c(0.3, 0.4, 0.3)),
+                   levels = c("Low", "Medium", "High"), ordered = TRUE)
+satisfaction <- factor(sample(c("Dissatisfied", "Neutral", "Satisfied"), 100,
+                               replace = TRUE, prob = c(0.3, 0.4, 0.3)),
+                       levels = c("Dissatisfied", "Neutral", "Satisfied"), ordered = TRUE)
+
+moderncor_cat(quality, satisfaction, method = "gamma")
+```
+
+### Somers' D
+
+Somers' D is an asymmetric ordinal measure: it measures the predictability of `y` from `x` (but not vice versa). Values range from −1 to 1:
+
+```{r somers-d, eval = requireNamespace("DescTools", quietly = TRUE)}
+moderncor_cat(quality, satisfaction, method = "somers_d")
+```
+
+Note that swapping `x` and `y` gives a different result:
+
+```{r somers-d-reversed, eval = requireNamespace("DescTools", quietly = TRUE)}
+moderncor_cat(satisfaction, quality, method = "somers_d")
+```
+
+## Pairwise Matrix for Multiple Variables
+
+Pass a `data.frame` of factor columns to compute pairwise associations across all pairs:
+
+```{r matrix-input, eval = requireNamespace("DescTools", quietly = TRUE)}
+df <- data.frame(
+  cyl   = factor(mtcars$cyl),
+  gear  = factor(mtcars$gear),
+  am    = factor(mtcars$am)
+)
+
+res_mat <- moderncor_cat(df, method = "cramers_v")
+res_mat
+```
+
+The result is a matrix of association coefficients. For nominal methods, the associated p-value matrix is also stored in `$p.value`:
+
+```{r matrix-pvalue, eval = requireNamespace("DescTools", quietly = TRUE)}
+res_mat$p.value
+```
+
+Use `as.data.frame()` to convert to tidy format:
+
+```{r as-data-frame, eval = requireNamespace("DescTools", quietly = TRUE)}
+as.data.frame(res_mat)
+```
+
+## Handling Missing Values
+
+The `use` argument controls how missing values are handled, mirroring the interface of `moderncor()`:
+
+- `"complete.obs"` (default): remove all rows with any NA before computing
+- `"pairwise.complete.obs"`: remove NAs per pair
+- `"everything"`: propagate NAs (returns NA for any pair with missing values)
+
+```{r missing-values, eval = requireNamespace("DescTools", quietly = TRUE)}
+x_na <- factor(c("A", "B", NA, "A", "B", "C"))
+y_na <- factor(c("X", "Y", "X", NA, "Y", "X"))
+
+moderncor_cat(x_na, y_na, method = "cramers_v", use = "complete.obs")
+```
+
+## Choosing the Right Method
+
+| Situation | Recommended method |
+|---|---|
+| Two unordered categorical variables (general) | `cramers_v` |
+| Two binary variables (2×2 table) | `phi` |
+| Two ordered categorical (Likert) variables | `gamma` |
+| Predicting one ordered variable from another | `somers_d` |
+| Comparing association across different table sizes | `cramers_v` or `tschuprow` |
+
+For continuous variables, use `moderncor()` instead. See `vignette("introduction")` for a full overview.

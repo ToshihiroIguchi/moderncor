@@ -20,7 +20,7 @@ The `moderncor` package provides a single unified interface for computing a wide
 
 Once installed, you can load the package as follows:
 
-```r
+```{r setup}
 library(moderncor)
 ```
 
@@ -36,26 +36,36 @@ y <- x^2 + rnorm(100, sd = 0.1)
 
 Because the relationship is non-linear and symmetric, classical Pearson correlation will fail to capture the dependence:
 
-```r
-library(moderncor)
+```{r pearson}
 moderncor(x, y, method = "pearson")
 ```
 
 With `moderncor`, you can compute distance correlation (`dcor`) or Chatterjee's Xi correlation (`xi`) using the same interface to capture the non-linear relationship:
 
-```r
+```{r modern, eval = requireNamespace("energy", quietly = TRUE)}
 # Distance Correlation (captures non-linear dependencies)
 moderncor(x, y, method = "dcor")
+```
 
+```{r xi, eval = requireNamespace("XICOR", quietly = TRUE)}
 # Chatterjee's Xi (captures functional dependence)
 moderncor(x, y, method = "xi")
+```
+
+## Classical Methods
+
+`moderncor` supports Pearson, Spearman, and Kendall correlations via the same interface as base R `cor()`:
+
+```{r classical}
+moderncor(x, y, method = "spearman")
+moderncor(x, y, method = "kendall")
 ```
 
 ## Matrix and Data Frame Input
 
 If you pass a matrix or a `data.frame` to `moderncor()`, it will compute the pairwise correlation matrix of the columns:
 
-```r
+```{r matrix-input}
 # Compute Spearman correlation matrix for iris dataset
 res_mat <- moderncor(iris[, 1:4], method = "spearman")
 res_mat
@@ -65,7 +75,7 @@ res_mat
 
 You can convert the output of `moderncor()` to a tidy data frame using `as.data.frame()`. This is particularly useful for correlation matrices:
 
-```r
+```{r as-data-frame}
 # Convert correlation matrix to tidy data frame
 df <- as.data.frame(res_mat)
 head(df)
@@ -77,21 +87,153 @@ This returns a data frame containing the variables being compared (`var1` and `v
 
 For large datasets, calculating p-values for modern methods (such as MIC, HSIC, or Mutual Information) can be slow because they rely on permutation tests. You can disable p-value calculations by setting `p_value = FALSE` for a significant speedup:
 
-```r
+```{r no-pvalue, eval = requireNamespace("energy", quietly = TRUE)}
 # Compute only the estimate, without p-values
 moderncor(x, y, method = "dcor", p_value = FALSE)
+```
+
+## Robust Correlations
+
+Robust correlations are less sensitive to outliers than classical methods. `moderncor` provides three robust correlation methods.
+
+### Biweight Midcorrelation
+
+Biweight midcorrelation down-weights observations far from the median using a biweight function. It requires no additional packages:
+
+```{r biweight}
+set.seed(42)
+x_out <- c(rnorm(95), rnorm(5, mean = 10))  # 5% outliers
+y_out <- c(rnorm(95), rnorm(5, mean = 10))
+
+moderncor(x_out, y_out, method = "biweight")
+```
+
+Compare with Pearson, which is strongly influenced by outliers:
+
+```{r biweight-vs-pearson}
+moderncor(x_out, y_out, method = "pearson")
+```
+
+### Percentage Bend Correlation
+
+Percentage bend correlation trims a specified proportion of the most extreme values (requires the `WRS2` package):
+
+```{r percentage-bend, eval = requireNamespace("WRS2", quietly = TRUE)}
+moderncor(x_out, y_out, method = "percentage_bend")
+```
+
+### Winsorized Correlation
+
+Winsorized correlation replaces extreme values with the nearest non-extreme values (requires `WRS2`):
+
+```{r winsorized, eval = requireNamespace("WRS2", quietly = TRUE)}
+moderncor(x_out, y_out, method = "winsorized")
+```
+
+## Ordinal Correlations
+
+Ordinal correlations are designed for ordered categorical (Likert-scale) data. They model the data as discretized versions of underlying continuous normal distributions.
+
+### Polychoric Correlation
+
+Polychoric correlation is appropriate when both variables are ordinal with more than two categories (requires `psych`):
+
+```{r polychoric, eval = requireNamespace("psych", quietly = TRUE)}
+# Simulate ordinal data (e.g., Likert scale responses)
+set.seed(1)
+z1 <- rnorm(200)
+z2 <- 0.7 * z1 + rnorm(200, sd = sqrt(1 - 0.7^2))
+x_ord <- cut(z1, breaks = c(-Inf, -1, 0, 1, Inf), labels = FALSE)
+y_ord <- cut(z2, breaks = c(-Inf, -1, 0, 1, Inf), labels = FALSE)
+
+moderncor(x_ord, y_ord, method = "polychoric")
+```
+
+### Tetrachoric Correlation
+
+Tetrachoric correlation is the special case of polychoric for binary (0/1) data (requires `psych`):
+
+```{r tetrachoric, eval = requireNamespace("psych", quietly = TRUE)}
+x_bin <- as.integer(z1 > 0)
+y_bin <- as.integer(z2 > 0)
+
+moderncor(x_bin, y_bin, method = "tetrachoric")
+```
+
+## Partial and Semi-Partial Correlations
+
+Partial and semi-partial correlations measure the relationship between two variables while controlling for one or more confounding variables (requires `ppcor`).
+
+### Partial Correlation
+
+Partial correlation removes the influence of `z` from *both* `x` and `y`:
+
+```{r partial, eval = requireNamespace("ppcor", quietly = TRUE)}
+set.seed(7)
+z <- rnorm(100)
+x_p <- 0.6 * z + rnorm(100, sd = 0.8)  # x correlates with z
+y_p <- 0.6 * z + rnorm(100, sd = 0.8)  # y correlates with z
+
+# Raw correlation (inflated by shared z)
+moderncor(x_p, y_p, method = "pearson")
+```
+
+```{r partial-controlled, eval = requireNamespace("ppcor", quietly = TRUE)}
+# Partial correlation controlling for z
+moderncor(x_p, y_p, method = "partial", z = z)
+```
+
+### Semi-Partial Correlation
+
+Semi-partial correlation removes the influence of `z` from `y` only (also requires `ppcor`):
+
+```{r semi-partial, eval = requireNamespace("ppcor", quietly = TRUE)}
+moderncor(x_p, y_p, method = "semi_partial", z = z)
+```
+
+The `method_partial` argument selects which base correlation to use (`"pearson"`, `"spearman"`, or `"kendall"`):
+
+```{r partial-spearman, eval = requireNamespace("ppcor", quietly = TRUE)}
+moderncor(x_p, y_p, method = "partial", z = z, method_partial = "spearman")
+```
+
+## Nonparametric Dependence Measures
+
+### Ball Correlation
+
+Ball correlation is a nonparametric measure of dependence based on ball covariance (requires `Ball`):
+
+```{r ball, eval = requireNamespace("Ball", quietly = TRUE)}
+moderncor(x, y, method = "ball")
+```
+
+### Bergsma-Dassios Tau*
+
+Bergsma-Dassios $\tau^*$ is a nonparametric measure of association that equals zero if and only if `x` and `y` are independent (requires `TauStar`):
+
+```{r tau-star, eval = requireNamespace("TauStar", quietly = TRUE)}
+moderncor(x, y, method = "tau_star")
 ```
 
 ## Querying Available Methods
 
 To see all supported correlation methods and their required packages:
 
-```r
+```{r available-methods}
 available_methods()
 ```
 
 To get details on a specific method:
 
-```r
+```{r method-info}
 method_info("dcor")
+```
+
+## Categorical Association Measures
+
+For categorical variables (factors or contingency tables), use `moderncor_cat()`. See `vignette("categorical")` for a full introduction to categorical association measures.
+
+```{r categorical-preview, eval = requireNamespace("DescTools", quietly = TRUE)}
+# Quick preview: Cramér's V for two factor variables
+moderncor_cat(factor(mtcars$cyl), factor(mtcars$gear), method = "cramers_v")
 ```

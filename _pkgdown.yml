@@ -1,0 +1,49 @@
+url: https://toshihiroiguchi.github.io/moderncor
+
+template:
+  bootstrap: 5
+
+home:
+  title: "moderncor — Unified Correlation Interface for R"
+  description: >
+    A single unified interface for computing classical and modern
+    correlation and association measures in R.
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [search, github]
+  components:
+    github:
+      icon: fab fa-github
+      href: https://github.com/ToshihiroIguchi/moderncor
+      aria-label: GitHub
+
+reference:
+  - title: "Continuous Variables"
+    desc: >
+      Main function for continuous correlation methods (classic, modern,
+      robust, ordinal, partial, and nonparametric).
+    contents:
+      - moderncor
+
+  - title: "Categorical Variables"
+    desc: >
+      Main function for categorical association measures (Cramér's V, Phi,
+      Gamma, Somers' D, Contingency Coefficient, Tschuprow's T).
+    contents:
+      - moderncor_cat
+
+  - title: "Helpers"
+    desc: "Query available methods and their metadata."
+    contents:
+      - available_methods
+      - method_info
+      - available_methods_cat
+
+articles:
+  - title: "Vignettes"
+    navbar: ~
+    contents:
+      - introduction
+      - categorical
