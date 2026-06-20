@@ -8,3 +8,5 @@
 ^tests/testthat/\.RData$
 ^.*\.Rcheck$
 ^docs$
+^_pkgdown\.yml$
+^\.claude$

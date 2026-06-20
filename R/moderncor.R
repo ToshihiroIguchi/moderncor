@@ -50,6 +50,21 @@
 #'
 #' @return An object of class \code{"moderncor"}.
 #'
+#' @details
+#' Most methods delegate both the estimate and the p-value to the original
+#' implementing package. The biweight midcorrelation is an exception: because no
+#' CRAN package provides it (the reference implementation lives in the
+#' Bioconductor-only \pkg{WGCNA} package), \code{moderncor} computes the estimate
+#' from the standard formula (Wilcox 2012) and approximates its p-value with a
+#' Student's t statistic, \eqn{t = r\sqrt{(n - 2) / (1 - r^2)}} on \eqn{n - 2}
+#' degrees of freedom (the same approximation used by \code{WGCNA::bicorAndPvalue}).
+#' This p-value is therefore approximate and should be interpreted with care for
+#' small samples or heavily contaminated data.
+#'
+#' @references
+#' Wilcox, R. R. (2012). \emph{Introduction to Robust Estimation and Hypothesis
+#' Testing} (3rd ed.). Academic Press.
+#'
 #' @export
 #' @examples
 #' # Generate some non-linear data (parabolic relationship)

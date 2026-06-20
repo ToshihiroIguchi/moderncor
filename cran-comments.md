@@ -6,15 +6,7 @@
 
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-## Notes
-
-* checking top-level files ... NOTE
-  Non-standard file/directory found at top level: '_pkgdown.yml'
-
-  This file is the standard configuration file for the pkgdown package
-  documentation site and is intentionally placed at the top level.
+0 errors | 0 warnings | 0 notes
 
 ## Notes on dependencies
 
